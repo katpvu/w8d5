@@ -55,11 +55,10 @@ Board.prototype.isValidPos = function (pos) {
  * throwing an Error if the position is invalid.
  */
 Board.prototype.getPiece = function (pos) {
-  if(this.isValidPos(pos)){
-    return this.grid[pos[0]][pos[1]];
-  } else {
+  if(!this.isValidPos(pos)){
     throw new Error("Not valid pos!");
   }
+  return this.grid[pos[0]][pos[1]];
 };
 
 /**
@@ -78,10 +77,10 @@ Board.prototype.isMine = function (pos, color) {
  * Checks if a given position has a piece on it.
  */
 Board.prototype.isOccupied = function (pos) {
-  if(this.getPiece(pos)){
-    return true;
-  } else {
+  if(this.grid[pos[0]][pos[1]] === undefined){
     return false;
+  } else {
+    return true;
   }
 };
 
@@ -99,14 +98,35 @@ Board.prototype.isOccupied = function (pos) {
  * Returns empty array if no pieces of the opposite color are found.
  */
 Board.prototype._positionsToFlip = function(pos, color, dir, piecesToFlip){
-  piecesToFlip = [];
+  if (!piecesToFlip) {
+    piecesToFlip = [];
+  } 
 
+  let nextPos = [pos[0] + dir[0], pos[1] + dir[1]]
+
+  //checking if valid pos
   if(!this.isValidPos(pos)){
     return [];
   }
-  if(!this.isOccupied([pos[0] + dir[0], pos[1] + dir[1] ] )){
+
+  //checking is empty pos
+  if(!this.isOccupied(nextPos)){
     return [];
   }
+
+  //checks if same color; if not, add to piecesToFlip
+  if (this.isMine(nextPos, color)) {
+    // if (piecesToFlip.length < 1) {
+      return piecesToFlip;
+    // } else {
+    //   return piecesToFlip
+    // }
+  } else {
+    piecesToFlip.push(nextPos);
+    return this._positionsToFlip(nextPos, color, dir, piecesToFlip);
+  }
+
+
 };
 
 /**
@@ -114,7 +134,23 @@ Board.prototype._positionsToFlip = function(pos, color, dir, piecesToFlip){
  * taking the position will result in some pieces of the opposite
  * color being flipped.
  */
+
+
 Board.prototype.validMove = function (pos, color) {
+  const dirs = [ [0,1], [-1, 1], [-1, 0], [0, -1], [-1, -1], [1, 0], [1,1], [1, -1] ]
+  if ( this.isOccupied(pos)) {
+    return false
+  } 
+
+  for (let i = 0; i < dirs.length; i++) {
+    // dir = dirs[i];
+    positions = this._positionsToFlip(pos, color, dirs[i])
+    if (positions.length > 0) {
+      return true
+    } 
+  }
+
+  return false
 };
 
 /**
