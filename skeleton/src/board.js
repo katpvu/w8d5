@@ -57,7 +57,7 @@ Board.prototype.isValidPos = function (pos) {
 Board.prototype.getPiece = function (pos) {
   if(!this.isValidPos(pos)){
     throw new Error("Not valid pos!");
-  }
+  } 
   return this.grid[pos[0]][pos[1]];
 };
 
@@ -77,10 +77,11 @@ Board.prototype.isMine = function (pos, color) {
  * Checks if a given position has a piece on it.
  */
 Board.prototype.isOccupied = function (pos) {
-  if(this.grid[pos[0]][pos[1]] === undefined){
-    return false;
-  } else {
+  // return !!this.getPiece(pos)
+  if(this.isValidPos(pos) && this.getPiece(pos)){
     return true;
+  } else {
+    return false;
   }
 };
 
@@ -144,7 +145,7 @@ Board.prototype.validMove = function (pos, color) {
 
   for (let i = 0; i < dirs.length; i++) {
     // dir = dirs[i];
-    positions = this._positionsToFlip(pos, color, dirs[i])
+    let positions = this._positionsToFlip(pos, color, dirs[i])
     if (positions.length > 0) {
       return true
     } 
